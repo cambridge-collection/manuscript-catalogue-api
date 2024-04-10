@@ -108,12 +108,11 @@ def ensure_urlencoded(var, safe=''):
 
 @app.get("/collections")
 async def get_collections(q: List[str] = Query(default=None),
-                      fq: List[str] = Query(default=None),
-                      sort: Union[str, None] = None,
-                      start: Union[str, None] = None,
-                      rows: Union[int, None] = None):
-
-    q_final =  ' AND '.join(q) if hasattr(q, '__iter__') else q
+                          fq: List[str] = Query(default=None),
+                          sort: Union[str, None] = None,
+                          start: Union[str, None] = None,
+                          rows: Union[int, None] = None):
+    q_final = ' AND '.join(q) if hasattr(q, '__iter__') else q
     rows_final = rows if rows in [8, 20] else 20
 
     # Limit params passed through to SOLR
@@ -142,7 +141,7 @@ def get_items(q: List[str] = Query(default=None),
                 sort_field = "%s_sort" % collection_name
                 sort_direction = re.sub(r'^.*collection_sort (asc|desc).*$', r'\1', sort)
                 sort = " ".join((sort_field, sort_direction))
-    q_final =  ' AND '.join(q) if hasattr(q, '__iter__') else q
+    q_final = ' AND '.join(q) if hasattr(q, '__iter__') else q
     rows_final = rows if rows in [8, 20] else 20
 
     # Limit params passed through to SOLR
@@ -154,8 +153,8 @@ def get_items(q: List[str] = Query(default=None),
 
 @app.get("/summary")
 def get_summary(q: List[str] = Query(default=None),
-                      fq: Union[str, None] = None):
-    q_final =  ' AND '.join(q) if hasattr(q, '__iter__') else q
+                fq: Union[str, None] = None):
+    q_final = ' AND '.join(q) if hasattr(q, '__iter__') else q
 
     # Very few params are relevant to the summary view
     params = {"q": q_final, "fq": fq}
