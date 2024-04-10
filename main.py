@@ -6,7 +6,7 @@ import re
 import requests
 import urllib.parse
 from typing import Union, List
-from fastapi import FastAPI, Request, Query
+from fastapi import FastAPI, Request, Query, HTTPException
 
 logger = logging.getLogger(__name__)
 
@@ -54,11 +54,19 @@ def delete_resource(resource_type: str, file_id: str):
 def get_request(resource_type: str, **kwargs):
     core = get_core_name(resource_type)
     try:
-        r = requests.get("%s/solr/%s/select" % (SOLR_URL, core), params=kwargs)
+        solr_params = kwargs
+        if 'original_sort' in solr_params:
+            del solr_params['original_sort']
+        r = requests.get("%s/solr/%s/select" % (SOLR_URL, core), params=solr_params)
         r.raise_for_status()
     except requests.exceptions.RequestException as e:
-        raise e
-
+        if hasattr(e.response, 'text'):
+            results = json.loads(e.response.text)
+            raise HTTPException(status_code=results["responseHeader"]["status"], detail=results["error"]["msg"])
+        else:
+            raise HTTPException(status_code=502, detail=str(e).split(':')[-1])
+    if 'original_sort' in kwargs and 'sort' in r.json()['responseHeader']['params']:
+        r.json()['responseHeader']['params']['sort'] = kwargs["original_sort"]
     return r.json()
 
 
@@ -121,12 +129,25 @@ def get_items(q: List[str] = Query(default=None),
               sort: Union[str, None] = None,
               start: Union[str, None] = None,
               rows: Union[int, None] = None):
+    original_sort = None
+    r = re.compile("^collection:")
+    fq_filtered = list(filter(r.match, fq))
+    collection_facet = fq_filtered[0] if fq_filtered else None
+    if sort and re.search(r'^collection_sort', sort):
+        original_sort = sort
+        if collection_facet:
+            if sort and re.search(r'collection_sort\s*(asc|desc)', sort.strip()):
+                collection_name_raw = re.sub(r'^collection:', '', collection_facet)
+                collection_name = re.sub(r'\s', '_', collection_name_raw)
+                sort_field = "%s_sort" % collection_name
+                sort_direction = re.sub(r'^.*collection_sort (asc|desc).*$', r'\1', sort)
+                sort = " ".join((sort_field, sort_direction))
     q_final =  ' AND '.join(q) if hasattr(q, '__iter__') else q
     rows_final = rows if rows in [8, 20] else 20
 
     # Limit params passed through to SOLR
     # Add facet to exclude collections from results
-    params = {"q": q_final, "fq": fq, "sort": sort, "start": start, "rows": rows_final}
+    params = {"q": q_final, "fq": fq, "sort": sort, "start": start, "rows": rows_final, "original_sort": original_sort}
     r = get_request('items', **params)
     return r
 
