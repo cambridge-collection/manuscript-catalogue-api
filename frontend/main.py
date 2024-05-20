@@ -132,7 +132,11 @@ def get_items(q: List[str] = Query(default=None),
               rows: Union[int, None] = None):
     original_sort = None
     r = re.compile("^collection:")
-    fq_filtered = list(filter(r.match, fq))
+
+    if fq:
+        fq_filtered = list(filter(r.match, fq))
+    else:
+        fq_filtered = None
     collection_facet = fq_filtered[0] if fq_filtered else None
     if sort and re.search(r'collection_sort', sort):
         original_sort = sort
