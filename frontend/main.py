@@ -11,8 +11,16 @@ from fastapi import FastAPI, Request, Query, HTTPException
 
 logger = logging.getLogger(__name__)
 
-SOLR_HOST = os.environ['SOLR_HOST']
-SOLR_PORT = os.environ['SOLR_PORT']
+if 'SOLR_HOST' in os.environ:
+    SOLR_HOST = os.environ['SOLR_HOST']
+else:
+    print('ERROR: SOLR_HOST environment variable not set')
+
+if 'SOLR_PORT' in os.environ:
+    SOLR_PORT = os.environ['SOLR_PORT']
+else:
+    print('WARN: SOLR_PORT environment variable not set')
+
 SOLR_URL = 'http://%s:%s' % (SOLR_HOST, SOLR_PORT)
 
 INTERNAL_ERROR_STATUS_CODE = '999'
