@@ -141,7 +141,7 @@ def get_items(q: List[str] = Query(default=None),
               start: Union[str, None] = None,
               rows: Union[int, None] = None):
     original_sort = None
-    r = re.compile("^collection:")
+    r = re.compile("^collection-slug:")
 
     if fq:
         fq_filtered = list(filter(r.match, fq))
@@ -152,7 +152,7 @@ def get_items(q: List[str] = Query(default=None),
         original_sort = sort
         if collection_facet:
             if sort and re.search(r'collection_sort\s+(asc|desc)', sort.strip()):
-                collection_name_raw = re.sub(r'^collection:', '', collection_facet)
+                collection_name_raw = re.sub(r'^collection-slug:', '', collection_facet)
                 collection_name = re.sub(r'\s', '_', collection_name_raw)
                 sort_field = "%s_sort" % collection_name
                 sort = re.sub(r'(^|\s|,)collection_sort\s+(asc|desc)', r'\1%s \2' % sort_field, sort)
