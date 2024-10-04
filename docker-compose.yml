@@ -1,6 +1,5 @@
 services:
   cudl-search-api:
-    platform: linux/amd64
     build:
       context: .
       dockerfile: Dockerfile
