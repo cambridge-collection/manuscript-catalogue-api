@@ -193,7 +193,6 @@ def translate_params(resource_type: str, **url_params):
                             filter['f.%s.facet.contains' % field ] = re.sub(r'^"(.+?)"$', r'\1', d)
                     fq.append('%s:"%s"' % (solr_name, re.sub(r'^"(.+?)"$', r'\1', date)))
             elif name in ALLOWED_FACETS:
-                print("%s : %s" % (name, type(value)))
                 # match old-style xtf facet names f\d+-
                 solr_name = re.sub(r'^f[0-9]+-(.+?)$',r'facet-\1', name)
                 for x in listify(value):
@@ -206,19 +205,15 @@ def translate_params(resource_type: str, **url_params):
                 start = (page - 1) * 20
                 solr_params['start'] = start
             elif name == 'sort':
-                #print('sorting')
                 sort_raw = set_params['sort'].split(',')[0]
-                #print(sort_raw)
                 sort_val: str = ''
                 if sort_raw in ['title', 'date']:
                     sort_val = sort_raw
                 else:
                     sort_val = 'score'
-                #print(sort_val)
                 sort_order = 'desc' if sort_val == 'score' else 'asc'
                 solr_params['sort'] = ' '.join([sort_val, sort_order])
             elif name != "rows":
-                #print('ELSE adding %s to q with %s' % (name, value))
                 val_string: str = stringify(value)
                 value_final = "(%s)" % val_string
                 q.append(":".join([name,value_final]))
@@ -236,11 +231,10 @@ def translate_params(resource_type: str, **url_params):
     solr_params = solr_params | filter
     for i in solr_delete + solr_fields:
         solr_params.pop(i, None)
-    print(resource_type)
-    print('SET PARAMS:')
-    print(set_params)
-    print('FINAL PARAMS:')
-    print(solr_params)
+    #print('SET PARAMS:')
+    #print(set_params)
+    #print('FINAL PARAMS:')
+    #print(solr_params)
     return solr_params
 
 
@@ -277,19 +271,13 @@ async def get_request(resource_type: str, **kwargs):
     core = get_core_name(resource_type)
     try:
         params = kwargs.copy()
-        #print('Params')
-        #print(params)
         solr_params = translate_params(core, **params)
-        #print('solr')
-        #print(solr_params)
-        #print('page' in solr_params)
         start = (int(solr_params['page']) - 1) * 20 if 'page' in solr_params else 0
         try:
             del solr_params.page
         except AttributeError:
             pass
-        #print('Params to send')
-        print(solr_params)
+        #print(solr_params)
         r = requests.get("%s/solr/%s/spell" % (SOLR_URL, core), params=solr_params, timeout=60)
         r.raise_for_status()
     except requests.exceptions.RequestException as e:
@@ -381,15 +369,11 @@ async def get_items(request: Request,
 
     facets = {}
     for x in filter(lambda x: x in ALLOWED_FACETS, request.query_params.keys()):
-        #print(x)
-        #print(request.query_params.getlist(x))
         facets[x]=request.query_params.getlist(x)
     rows = rows if rows in [8, 20] else 20
     # Limit params passed through to SOLR
     # Add facet to exclude collections from results
-    params = {#"q": q_final,
-        #"fq": fq,
-        "sort": sort,
+    params = {"sort": sort,
         #"start": start,
         "page": page,
         "rows": rows,
@@ -397,7 +381,6 @@ async def get_items(request: Request,
         "ms_title_t": request.query_params.getlist('ms_title_t'),
         "name_t": request.query_params.getlist('name_t')
     }
-    print(params)
     r = await get_request('items', **params, **facets)
     return r
 
