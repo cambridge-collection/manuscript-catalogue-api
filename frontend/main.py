@@ -205,7 +205,7 @@ def translate_params(resource_type: str, **url_params):
                 start = (page - 1) * 20
                 solr_params['start'] = start
             elif name == 'sort':
-                sort_raw = set_params['sort'].split(',')[0]
+                sort_raw = set_params['sort'][0]
                 sort_val: str = ''
                 if sort_raw in ['title', 'date']:
                     sort_val = sort_raw
