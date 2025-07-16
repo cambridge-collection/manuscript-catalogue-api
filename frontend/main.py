@@ -251,9 +251,8 @@ def generate_datestring(year, month, day):
 
 
 async def delete_resource(resource_type: str, file_id: str):
-    delete_query = "id:%s" % file_id
+    delete_query = 'id:"%s"' % urllib.parse.unquote_plus(file_id)
     delete_cmd = {'delete': {'query': delete_query}}
-
     core = get_core_name(resource_type)
     if core:
         r = requests.post(url="%s/solr/%s/update" % (SOLR_URL, core),
