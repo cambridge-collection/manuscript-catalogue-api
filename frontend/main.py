@@ -170,7 +170,7 @@ def translate_params(resource_type: str, **url_params):
                 value_final = "(%s)" % val_string
                 q.append(value_final)
             elif re.match(r'^f[0-9]+-date$', name):
-                val_list = value.split(',')
+                val_list = value
                 val_list.sort()
                 fields = ['facet-year', 'facet-year-month', 'facet-year-month-day']
                 for date in val_list:
