@@ -11,8 +11,8 @@ from fastapi import FastAPI, Request, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 origins = [
-    "https://mscat-dev.cudl-sandbox.net",
-    "http://localhost:5173"
+    "https://mscat-medieval-production.medieval.lib.cam.ac.uk",
+    "https://medieval.lib.cam.ac.uk"
 ]
 
 logger = logging.getLogger('gunicorn.error')
