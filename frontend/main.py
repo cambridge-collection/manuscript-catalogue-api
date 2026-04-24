@@ -203,16 +203,12 @@ def translate_params(resource_type: str, **url_params):
             elif name == 'page':
                 page = int(set_params['page'])
                 start = (page - 1) * 20
-                solr_params['start'] = start
-            elif name == 'sort':
-                sort_raw = set_params['sort'][0]
-                sort_val: str = ''
-                if sort_raw in ['title', 'date']:
-                    sort_val = sort_raw
-                else:
-                    sort_val = 'score'
-                sort_order = 'desc' if sort_val == 'score' else 'asc'
-                solr_params['sort'] = ' '.join([sort_val, sort_order])
+                solr_params["start"] = start
+            elif name == "sort":
+                sort_raw = set_params["sort"]
+                sort_val = sort_raw if sort_raw in ["title", "date"] else "score"
+                sort_order = "desc" if sort_val == "score" else "asc"
+                solr_params["sort"] = " ".join([sort_val, sort_order])
             elif name != "rows":
                 val_string: str = stringify(value)
                 value_final = "(%s)" % val_string
