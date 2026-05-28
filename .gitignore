@@ -1,14 +1,24 @@
-# VCS
-.git/
-.gitignore
-
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
-*.egg-info/
+*.so
+.Python
 build/
+develop-eggs/
 dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
 # Virtual environments
 venv/
@@ -19,6 +29,7 @@ ENV/
 # Environment variables / secrets
 .env
 .env.*
+!.env.example
 
 # Testing / coverage
 .pytest_cache/
@@ -26,20 +37,27 @@ ENV/
 .coverage.*
 htmlcov/
 .tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Type checkers / linters
 .mypy_cache/
 .ruff_cache/
+.pytype/
 
 # IDEs / editors
 .idea/
 .vscode/
 *.swp
+*.swo
+*~
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Docs / misc
-README.md
-TODO.md
-master.md
+# Logs
 *.log
+logs/
